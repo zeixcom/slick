@@ -701,14 +701,14 @@
             case 'previous':
                 slideOffset = indexOffset === 0 ? _.options.slidesToScroll : _.options.slidesToShow - indexOffset;
                 if (_.slideCount > _.options.slidesToShow) {
-                    _.slideHandler(_.currentSlide - slideOffset, false, dontAnimate);
+                    _.slideHandler(_.currentSlide - slideOffset, false, dontAnimate, event.data.message);
                 }
                 break;
 
             case 'next':
                 slideOffset = indexOffset === 0 ? _.options.slidesToScroll : indexOffset;
                 if (_.slideCount > _.options.slidesToShow) {
-                    _.slideHandler(_.currentSlide + slideOffset, false, dontAnimate);
+                    _.slideHandler(_.currentSlide + slideOffset, false, dontAnimate, event.data.message);
                 }
                 break;
 
@@ -716,14 +716,13 @@
                 var index = event.data.index === 0 ? 0 :
                     event.data.index || $target.index() * _.options.slidesToScroll;
 
-                _.slideHandler(_.checkNavigable(index), false, dontAnimate);
+                _.slideHandler(_.checkNavigable(index), false, dontAnimate, event.data.message);
                 $target.children().trigger('focus');
                 break;
 
             default:
                 return;
         }
-
     };
 
     Slick.prototype.checkNavigable = function(index) {
@@ -2356,7 +2355,7 @@
 
     };
 
-    Slick.prototype.slideHandler = function(index, sync, dontAnimate) {
+    Slick.prototype.slideHandler = function(index, sync, dontAnimate, target) {
 
         var targetSlide, animSlide, oldSlide, slideLeft, targetLeft = null,
             _ = this, navTarget;
@@ -2377,6 +2376,10 @@
 
         if (sync === false) {
             _.asNavFor(index);
+        }
+
+        if (typeof target === typeof undefined) {
+            target = "no target"
         }
 
         targetSlide = index;
@@ -2433,7 +2436,7 @@
 
         _.animating = true;
 
-        _.$slider.trigger('beforeChange', [_, _.currentSlide, animSlide]);
+        _.$slider.trigger('beforeChange', [_, _.currentSlide, animSlide, target]);
 
         oldSlide = _.currentSlide;
         _.currentSlide = animSlide;
@@ -2590,7 +2593,7 @@
 
             if( direction != 'vertical' ) {
 
-                _.slideHandler( slideCount );
+                _.slideHandler( slideCount, false, this.options.animating, direction );
                 _.touchObject = {};
                 _.$slider.trigger('swipe', [_, direction ]);
 
@@ -2600,7 +2603,7 @@
 
             if ( _.touchObject.startX !== _.touchObject.curX ) {
 
-                _.slideHandler( _.currentSlide );
+                _.slideHandler( _.currentSlide, false, this.options.animating );
                 _.touchObject = {};
 
             }
